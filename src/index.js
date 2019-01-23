@@ -1,12 +1,17 @@
 import { GraphQLServer } from "graphql-yoga";
+import { getPackedSettings } from "http2";
 
 //Type definitions
 
+//example
 const typeDefs = `
 
 type Query {
-   name: String!,
+   id: ID!
+   firstname: String!,
    lastname: String!,
+   age: Int!,
+   gpa: Float!
 }
 
 `;
@@ -19,6 +24,12 @@ const resolvers = {
     },
     lastname() {
       return "Your last name would go here";
+    },
+    age() {
+      return 17;
+    },
+    gpa() {
+      return 3.1;
     }
   }
 };
