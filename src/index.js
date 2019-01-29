@@ -1,4 +1,5 @@
 import { GraphQLServer } from "graphql-yoga";
+import AddArgumentsAsVariablesTransform from "graphql-tools/dist/transforms/AddArgumentsAsVariables";
 
 //Type definitions
 
@@ -8,9 +9,10 @@ import { GraphQLServer } from "graphql-yoga";
 const typeDefs = `
   type Query {
     greeting(name: String, position:String): String!
-    add(a: Float!, b: Float!): Float!
+    add(numbers: [Float!]!) : Float!
     me: User!
     post: Post!
+    grades: [Int!]!
   }
 
   type User {
@@ -55,6 +57,16 @@ const resolvers = {
         body: "This is how you kill a mocking bird",
         published: true
       };
+    },
+    add(parent, args, ctx, info) {
+      if (args.length < 0) {
+        return 0;
+      }
+
+      return args.numbers.reduce((accum, val) => accum + val);
+    },
+    grades(parent, args, ctx, info) {
+      return [90, 10, 20, 80, 70, 65, 89];
     }
   }
 };
