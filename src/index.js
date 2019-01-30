@@ -5,15 +5,55 @@ import AddArgumentsAsVariablesTransform from "graphql-tools/dist/transforms/AddA
 
 //example
 
+//demo users
+
+const users = [
+  {
+    id: "1",
+    name: "Steven",
+    email: "steven.magadan@hotmail.com"
+  },
+  {
+    id: "2",
+    name: "Greyson",
+    email: "Bennett"
+  },
+  {
+    id: "3",
+    name: "Jackson",
+    email: "jackson1@gmail.com"
+  }
+];
+
+const posts = [
+  {
+    id: "1",
+    title: "A generic post",
+    body: "This is just a generic post to show people reading the blog",
+    published: true
+  },
+  {
+    id: "2",
+    title: "A new dawn",
+    body: "dawn comes after darkness",
+    published: false
+  },
+  {
+    id: "3",
+    title: "awesome post",
+    body: "this is an awesome post",
+    published: true
+  }
+];
+
 //Parenthesis (parent, args, ctx, info)
 const typeDefs = `
   type Query {
-    greeting(name: String, position:String): String!
-    add(numbers: [Float!]!) : Float!
+    users(query:String): [User!]!
+    posts(query:String): [Post!]!
     me: User!
     post: Post!
-    grades: [Int!]!
-  }
+    }
 
   type User {
     id: ID!
@@ -34,14 +74,31 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    greeting(parent, args, ctx, info) {
-      console.log(parent, args, ctx, info);
-      if (args.name && args.position) {
-        return `Hello, this is a greeting, ${args.name} and your position is ${
-          args.position
-        }`;
+    users(parent, args, info, ctx) {
+      if (!args.query) {
+        return users;
       }
+      return users.filter(user => {
+        return user.name.toLowerCase().includes(args.query.toLowerCase());
+      });
     },
+
+    posts(parent, args, info, ctx) {
+      if (!args.query) {
+        return posts;
+      }
+      return posts.filter(post => {
+        const titleMatch = post.title
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+        const bodyMatch = post.body
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+
+        return titleMatch || bodyMatch;
+      });
+    },
+
     me() {
       return {
         id: 1234,
@@ -57,16 +114,6 @@ const resolvers = {
         body: "This is how you kill a mocking bird",
         published: true
       };
-    },
-    add(parent, args, ctx, info) {
-      if (args.length < 0) {
-        return 0;
-      }
-
-      return args.numbers.reduce((accum, val) => accum + val);
-    },
-    grades(parent, args, ctx, info) {
-      return [90, 10, 20, 80, 70, 65, 89];
     }
   }
 };
@@ -76,7 +123,7 @@ const server = new GraphQLServer({
   resolvers
 });
 
-console.log("Testing server");
+console.log("Testing server start");
 
 server.start(() => {
   console.log("The server has started");
