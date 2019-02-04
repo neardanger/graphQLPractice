@@ -30,19 +30,44 @@ const posts = [
     id: "1",
     title: "A generic post",
     body: "This is just a generic post to show people reading the blog",
-    published: true
+    published: true,
+    author: "1"
   },
   {
     id: "2",
     title: "A new dawn",
     body: "dawn comes after darkness",
-    published: false
+    published: false,
+    author: "2"
   },
   {
     id: "3",
     title: "awesome post",
     body: "this is an awesome post",
-    published: true
+    published: true,
+    author: "3"
+  }
+];
+
+const comments = [
+  {
+    id: "1",
+    title: "dirk sucks",
+    body:
+      "Rest is going to be obsolete pretty soon its just a matter of time before graphql gains massive adaptation",
+    author: "1"
+  },
+  {
+    id: "2",
+    title: "dirk caber",
+    body: "He is the best actor in the current day and age",
+    author: "2"
+  },
+  {
+    id: "3",
+    title: "will braun",
+    body: "Another popular actor in the website that showcases things",
+    author: "3"
   }
 ];
 
@@ -51,6 +76,7 @@ const typeDefs = `
   type Query {
     users(query:String): [User!]!
     posts(query:String): [Post!]!
+    comments(query:String):[Comment!]!
     me: User!
     post: Post!
     }
@@ -60,14 +86,25 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+    posts: [Post!]!
 }
 
   type Post {
     id: ID!,
-    title: String!,
-    body: String!,
+    title: String!
+    body: String!
     published: Boolean!
+    author: User!
   }
+
+
+  type Comment {
+    id: ID!
+    title: String!
+    body: String!
+    author: User!
+  }
+
 
 `;
 //Resolvers
@@ -79,7 +116,9 @@ const resolvers = {
         return users;
       }
       return users.filter(user => {
-        return user.name.toLowerCase().includes(args.query.toLowerCase());
+        const userMatch = user.toLowerCase().includes(args.query.toLowerCase());
+
+        return userMatch;
       });
     },
 
@@ -114,6 +153,43 @@ const resolvers = {
         body: "This is how you kill a mocking bird",
         published: true
       };
+    },
+
+    comments(parent, args, info, ctx) {
+      if (!args.query) {
+        return comments;
+      }
+      return comments.filter(comment => {
+        const commentTitle = comment.title
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+        const bodyTitle = comment.title
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+
+        return commentTitle || bodyTitle;
+      });
+    }
+  },
+  Post: {
+    author(parent, args, info, ctx) {
+      return users.find(user => {
+        return user.id === parent.author;
+      });
+    }
+  },
+  User: {
+    posts(parent, args, info, ctx) {
+      return posts.filter(post => {
+        return post.author === parent.id;
+      });
+    }
+  },
+  Comment: {
+    author(parent, args, info, ctx) {
+      return comments.filter(comment => {
+        return comment.author === parent.id;
+      });
     }
   }
 };
@@ -128,3 +204,5 @@ console.log("Testing server start");
 server.start(() => {
   console.log("The server has started");
 });
+
+console.log("This is pretty")
