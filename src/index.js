@@ -116,7 +116,9 @@ const resolvers = {
         return users;
       }
       return users.filter(user => {
-        const userMatch = user.toLowerCase().includes(args.query.toLowerCase());
+        const userMatch = user.name
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
 
         return userMatch;
       });
@@ -205,4 +207,4 @@ server.start(() => {
   console.log("The server has started");
 });
 
-console.log("This is pretty")
+console.log("This is pretty");
