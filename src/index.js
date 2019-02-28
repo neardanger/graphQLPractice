@@ -22,6 +22,11 @@ const users = [
     id: "3",
     name: "Jackson",
     email: "jackson1@gmail.com"
+  },
+  {
+    id: "4",
+    name: "Lucas",
+    email: "lucas.magadan@hotmail.com"
   }
 ];
 
@@ -68,6 +73,12 @@ const comments = [
     title: "will braun",
     body: "Another popular actor in the website that showcases things",
     author: "3"
+  },
+  {
+    id: "4",
+    title: "Jason Mason",
+    body: "This is a dummy comment",
+    author: "4"
   }
 ];
 
@@ -87,6 +98,7 @@ const typeDefs = `
     email: String!
     age: Int
     posts: [Post!]!
+    comments:[Comment!]!
 }
 
   type Post {
@@ -178,6 +190,11 @@ const resolvers = {
       return users.find(user => {
         return user.id === parent.author;
       });
+    },
+    comments(parent,args,info,ctx) {
+      return comments.finder(comment => {
+        
+      })
     }
   },
   User: {
@@ -185,12 +202,17 @@ const resolvers = {
       return posts.filter(post => {
         return post.author === parent.id;
       });
+    },
+    comments(parent, args, info, ctx) {
+      return comments.filter(comment => {
+        return comment.author === parent.id;
+      });
     }
   },
   Comment: {
     author(parent, args, info, ctx) {
       return comments.filter(comment => {
-        return comment.author === parent.id;
+        return comment.id === parent.author;
       });
     }
   }
@@ -207,4 +229,4 @@ server.start(() => {
   console.log("The server has started");
 });
 
-console.log("This is pretty");
+// connector trying jawline kung embroider spoiler
