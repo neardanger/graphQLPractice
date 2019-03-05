@@ -1,5 +1,6 @@
 import { GraphQLServer } from "graphql-yoga";
 import AddArgumentsAsVariablesTransform from "graphql-tools/dist/transforms/AddArgumentsAsVariables";
+import uuidv4 from "uuid/v4";
 
 //Type definitions
 
@@ -97,7 +98,7 @@ const typeDefs = `
     }
 
   type Mutation {
-    createUser(name:String!, email: String!, age:Int) : User!
+    createUser(name:String!, email: String!, age:Int):User!
   }
 
 
@@ -200,7 +201,7 @@ const resolvers = {
 
   Mutation: {
     createUser(parent, args, info, ctx) {
-      console.log(args);
+      return emailTaken;
     }
   },
 
