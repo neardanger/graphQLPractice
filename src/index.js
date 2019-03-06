@@ -201,7 +201,10 @@ const resolvers = {
 
   Mutation: {
     createUser(parent, args, info, ctx) {
-      return emailTaken;
+      const userTaken = users.some(user => user.email === args.email);
+      if (userTaken) {
+        throw new Error("This username is taken");
+      }
     }
   },
 
