@@ -99,6 +99,7 @@ const typeDefs = `
 
   type Mutation {
     createUser(name:String!, email: String!, age:Int):User!
+    createPost(title:String!,body:String!,published:Boolean,author:ID!) : Post!
   }
 
 
@@ -205,6 +206,34 @@ const resolvers = {
       if (userTaken) {
         throw new Error("This username is taken");
       }
+      const user = {
+        id: uuidv4(),
+        name: args.name,
+        email: args.email,
+        age: args.age
+      };
+      users.push(user);
+      return user;
+    },
+    createPost(parent, args, info, ctx) {
+      if (!args) {
+        return posts;
+      }
+
+      const userExists = users.some(user => user.id === args.author);
+      if (!userExists) {
+        throw new Error("This user does not exist.");
+      }
+      const post = {
+        id: uuidv4(),
+        title: args.title,
+        body: args.body,
+        published: args.published,
+        author: args.author
+      };
+      posts.push(post);
+
+      return post;
     }
   },
 
