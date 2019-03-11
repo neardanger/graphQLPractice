@@ -99,7 +99,8 @@ const typeDefs = `
 
   type Mutation {
     createUser(name:String!, email: String!, age:Int):User!
-    createPost(title:String!,body:String!,published:Boolean,author:ID!) : Post!
+    createPost(title:String!,body:String!,published:Boolean!,author:ID!) : Post!
+    createComment(title:String!,body:String!,author:ID!, post: ID!) : Comment!
   }
 
 
@@ -130,8 +131,6 @@ const typeDefs = `
     author: User!
     post: Post!
   }
-
-
 `;
 //Resolvers
 
@@ -166,9 +165,22 @@ const resolvers = {
       });
     },
 
+    comments(parent, args, info, ctx) {
+      if (!args.query) {
+        return comments;
+      }
+      const titleSort = comments.filter(comment => {
+        comment.toLowerCase().includes(args.query.toLowerCase());
+      });
+      const bodySort = comments.filter(comment => {
+        comment.toLowerCase().includes(args.query.toLowerCase());
+      });
+      return titleSort || bodySort;
+    },
+
     me() {
       return {
-        id: 1234,
+        id: "1234",
         name: "Steven Magadan",
         email: "steven.magadan@hotmail.com",
         age: 18
@@ -176,27 +188,11 @@ const resolvers = {
     },
     post() {
       return {
-        id: 9222,
+        id: "9222",
         title: "To kill a mocking bird",
         body: "This is how you kill a mocking bird",
         published: true
       };
-    },
-
-    comments(parent, args, info, ctx) {
-      if (!args.query) {
-        return comments;
-      }
-      return comments.filter(comment => {
-        const commentTitle = comment.title
-          .toLowerCase()
-          .includes(args.query.toLowerCase());
-        const bodyTitle = comment.title
-          .toLowerCase()
-          .includes(args.query.toLowerCase());
-
-        return commentTitle || bodyTitle;
-      });
     }
   },
 
@@ -215,11 +211,8 @@ const resolvers = {
       users.push(user);
       return user;
     },
-    createPost(parent, args, info, ctx) {
-      if (!args) {
-        return posts;
-      }
 
+    createPost(parent, args, info, ctx) {
       const userExists = users.some(user => user.id === args.author);
       if (!userExists) {
         throw new Error("This user does not exist.");
@@ -234,6 +227,26 @@ const resolvers = {
       posts.push(post);
 
       return post;
+    },
+    createComment(parent, args, info, ctx) {
+      const userExists = users.some(user => user.id === args.author);
+      const postExists = posts.some(
+        post => post.id === args.post && post.published
+      );
+
+      if (!userExists || !postExists) {
+        throw new Error("This user does not exist along with the post");
+      }
+      const comment = {
+        id: uuidv4(),
+        title: args.title,
+        body: args.body,
+        author: args.author,
+        post: args.post
+      };
+      comments.push(comment);
+
+      return comment;
     }
   },
 
@@ -244,19 +257,19 @@ const resolvers = {
       });
     },
     comments(parent, args, info, ctx) {
-      return comments.find(comment => {
+      return comments.filter(comment => {
         return comment.post === parent.id;
       });
     }
   },
   User: {
     posts(parent, args, info, ctx) {
-      return posts.find(post => {
+      return posts.filter(post => {
         return post.author === parent.id;
       });
     },
     comments(parent, args, info, ctx) {
-      return comments.find(comment => {
+      return comments.filter(comment => {
         return comment.author === parent.id;
       });
     }
