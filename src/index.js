@@ -17,7 +17,7 @@ const users = [
   {
     id: "2",
     name: "Greyson",
-    email: "Bennett"
+    email: "Bennett@gmail.com"
   },
   {
     id: "3",
@@ -224,16 +224,14 @@ const resolvers = {
       }
       const user = {
         id: uuidv4(),
-        name: args.name,
-        email: args.email,
-        age: args.age
+        ...args
       };
       users.push(user);
       return user;
     },
 
     createPost(parent, args, info, ctx) {
-      const userExists = users.some(user => user.id === args.author);
+      const userExists = users.some(user => user.id === args.data.author);
       if (!userExists) {
         throw new Error("This user does not exist.");
       }
@@ -242,14 +240,14 @@ const resolvers = {
         title: args.title,
         body: args.body,
         published: args.published,
-        author: args.author
+        author: args.data.author
       };
       posts.push(post);
 
       return post;
     },
     createComment(parent, args, info, ctx) {
-      const userExists = users.some(user => user.id === args.author);
+      const userExists = users.some(user => user.id === args.data.author);
       const postExists = posts.some(
         post => post.id === args.post && post.published
       );
@@ -261,7 +259,7 @@ const resolvers = {
         id: uuidv4(),
         title: args.title,
         body: args.body,
-        author: args.author,
+        author: args.data.author,
         post: args.post
       };
       comments.push(comment);
