@@ -237,10 +237,7 @@ const resolvers = {
       }
       const post = {
         id: uuidv4(),
-        title: args.title,
-        body: args.body,
-        published: args.published,
-        author: args.data.author
+        ...args
       };
       posts.push(post);
 
@@ -257,10 +254,7 @@ const resolvers = {
       }
       const comment = {
         id: uuidv4(),
-        title: args.title,
-        body: args.body,
-        author: args.data.author,
-        post: args.post
+        ...args
       };
       comments.push(comment);
 
