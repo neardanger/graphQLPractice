@@ -99,6 +99,7 @@ const typeDefs = `
 
   type Mutation {
     createUser(data: CreateUserInput):User!
+    deleteUser(id:ID!) : User!
     createPost(data: CreatePostInput) : Post!
     createComment(data: CreateCommentInput) : Comment!
   }
@@ -218,13 +219,13 @@ const resolvers = {
 
   Mutation: {
     createUser(parent, args, info, ctx) {
-      const userTaken = users.some(user => user.email === args.email);
+      const userTaken = users.some(user => user.email === args.data.email);
       if (userTaken) {
         throw new Error("This username is taken");
       }
       const user = {
         id: uuidv4(),
-        ...args
+        ...args.data
       };
       users.push(user);
       return user;
@@ -237,7 +238,7 @@ const resolvers = {
       }
       const post = {
         id: uuidv4(),
-        ...args
+        ...args.data
       };
       posts.push(post);
 
@@ -246,7 +247,7 @@ const resolvers = {
     createComment(parent, args, info, ctx) {
       const userExists = users.some(user => user.id === args.data.author);
       const postExists = posts.some(
-        post => post.id === args.post && post.published
+        post => post.id === args.data.post && post.published
       );
 
       if (!userExists || !postExists) {
@@ -254,11 +255,24 @@ const resolvers = {
       }
       const comment = {
         id: uuidv4(),
-        ...args
+        ...args.data
       };
       comments.push(comment);
 
       return comment;
+    },
+
+    deleteUser(parent, args, info, ctx) {
+      const findIndex = users.findIndex(user => user.id === args.id);
+      const removeElement = users.splice(findIndex, 1);
+      if (findIndex === -1) {
+        throw new Error("There is no user with that id!");
+      }
+      post = posts.filter((post) => {
+        if(post.author === args.id) {
+          match = 
+        }
+      })
     }
   },
 
