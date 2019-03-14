@@ -116,12 +116,7 @@ const typeDefs = `
     author: ID!
   }
 
-  input CreateCommentInput {
-    title: String!
-    body: String!
-    author: ID!
-    post: ID!
-  }
+ 
 
 
   type User {
