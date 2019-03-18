@@ -263,17 +263,10 @@ const resolvers = {
     },
 
     deleteUser(parent, args, info, ctx) {
-      const findIndex = users.findIndex(user => user.id === args.id);
-      const removeElement = users.splice(findIndex, 1);
-      if (findIndex === -1) {
-        throw new Error("There is no user with that id!");
-      }
-      post = posts.filter((post) => {
-        if(post.author === args.id) {
-          match = 
-        }
-      })
-    }
+     const findUser = users.findIndex((user) => args.id === user.id)
+     if(findUser === -1) {
+       throw new Error("That user was not found in the database.")
+     }
   },
 
   Post: {
