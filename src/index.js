@@ -31,7 +31,7 @@ const users = [
   }
 ];
 
-const posts = [
+let posts = [
   {
     id: "1",
     title: "A generic post",
@@ -55,7 +55,7 @@ const posts = [
   }
 ];
 
-const comments = [
+let comments = [
   {
     id: "1",
     title: "dirk sucks",
@@ -263,10 +263,25 @@ const resolvers = {
     },
 
     deleteUser(parent, args, info, ctx) {
-     const findUser = users.findIndex((user) => args.id === user.id)
-     if(findUser === -1) {
-       throw new Error("That user was not found in the database.")
-     }
+      const findUser = users.findIndex(user => args.id === user.id);
+      if (findUser === -1) {
+        throw new Error("That user was not found in the database.");
+      }
+      const deleteUser = users.splice(findUser, 1);
+
+      posts = posts.filter(post => {
+        const match = post.author === args.id;
+
+        if (match) {
+          comments = comments.filter(comment => comment.post !== post.id);
+        }
+
+        return !match;
+      });
+      comments = comments.filter(comment => comment.author !== args.id);
+
+      return deleteUser[0];
+    }
   },
 
   Post: {
