@@ -1,9 +1,9 @@
 const Query = {
-  users(parent, args, info, ctx) {
+  users(parent, args, { db }, info) {
     if (!args.query) {
-      return users;
+      return db.users;
     }
-    return users.filter(user => {
+    return db.users.filter(user => {
       const userMatch = user.name
         .toLowerCase()
         .includes(args.query.toLowerCase());
@@ -12,11 +12,11 @@ const Query = {
     });
   },
 
-  posts(parent, args, info, ctx) {
+  posts(parent, args, { db }, info) {
     if (!args.query) {
-      return posts;
+      return db.posts;
     }
-    return posts.filter(post => {
+    return db.posts.filter(post => {
       const titleMatch = post.title
         .toLowerCase()
         .includes(args.query.toLowerCase());
@@ -28,14 +28,14 @@ const Query = {
     });
   },
 
-  comments(parent, args, info, ctx) {
+  comments(parent, args, { db }, info) {
     if (!args.query) {
-      return comments;
+      return db.comments;
     }
-    const titleSort = comments.filter(comment => {
+    const titleSort = db.comments.filter(comment => {
       comment.toLowerCase().includes(args.query.toLowerCase());
     });
-    const bodySort = comments.filter(comment => {
+    const bodySort = db.comments.filter(comment => {
       comment.toLowerCase().includes(args.query.toLowerCase());
     });
     return titleSort || bodySort;
