@@ -1,11 +1,11 @@
 const Post = {
-  author(parent, args, info, ctx) {
-    return users.find(user => {
+  author(parent, args, { db }, info) {
+    return db.users.find(user => {
       return user.id === parent.author;
     });
   },
-  comments(parent, args, info, ctx) {
-    return comments.filter(comment => {
+  comments(parent, args, { db }, info) {
+    return db.comments.filter(comment => {
       return comment.post === parent.id;
     });
   }

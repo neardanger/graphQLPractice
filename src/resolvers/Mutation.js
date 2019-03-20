@@ -1,8 +1,8 @@
 import uuidv4 from "uuid/v4";
 
 const Mutation = {
-  createUser(parent, args, info, ctx) {
-    const userTaken = users.some(user => user.email === args.data.email);
+  createUser(parent, args, { db }, info) {
+    const userTaken = db.users.some(user => user.email === args.data.email);
     if (userTaken) {
       throw new Error("This username is taken");
     }
@@ -10,12 +10,12 @@ const Mutation = {
       id: uuidv4(),
       ...args.data
     };
-    users.push(user);
+    db.users.push(user);
     return user;
   },
 
-  createPost(parent, args, info, ctx) {
-    const userExists = users.some(user => user.id === args.data.author);
+  createPost(parent, args, { db }, info) {
+    const userExists = db.users.some(user => user.id === args.data.author);
     if (!userExists) {
       throw new Error("This user does not exist.");
     }
@@ -23,13 +23,13 @@ const Mutation = {
       id: uuidv4(),
       ...args.data
     };
-    posts.push(post);
+    db.posts.push(post);
 
     return post;
   },
-  createComment(parent, args, info, ctx) {
-    const userExists = users.some(user => user.id === args.data.author);
-    const postExists = posts.some(
+  createComment(parent, args, { db }, info) {
+    const userExists = db.users.some(user => user.id === args.data.author);
+    const postExists = db.posts.some(
       post => post.id === args.data.post && post.published
     );
 
@@ -40,30 +40,34 @@ const Mutation = {
       id: uuidv4(),
       ...args.data
     };
-    comments.push(comment);
+    db.comments.push(comment);
 
     return comment;
   },
 
-  deleteUser(parent, args, info, ctx) {
-    const findUser = users.findIndex(user => args.id === user.id);
+  deleteUser(parent, args, { db }, info) {
+    const findUser = db.users.findIndex(user => user.id === args.id);
     if (findUser === -1) {
-      throw new Error("That user was not found in the database.");
+      throw new Error("This user was not found");
     }
-    const deleteUser = users.splice(findUser, 1);
-
-    posts = posts.filter(post => {
+    const deleteUser = db.users.splice(findUser, 1);
+    db.posts = db.posts.filter(post => {
       const match = post.author === args.id;
-
       if (match) {
-        comments = comments.filter(comment => comment.post !== post.id);
+        db.comments = db.comments.filter(comment => {
+          return comment.post !== post.id;
+        });
       }
-
       return !match;
     });
-    comments = comments.filter(comment => comment.author !== args.id);
-
-    return deleteUser[0];
+    db.comments = db.comments.filter(comment => {
+      return comment.author !== args.id;
+    });
+    return deleteUser;
+  },
+  deletePost(parent, args, { db }, info) {
+    const findPost = db.posts.findIndex(post => post.id === args.id);
+    const deletePost = db.posts.splice(findPost, 1);
   }
 };
 
