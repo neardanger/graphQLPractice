@@ -63,11 +63,30 @@ const Mutation = {
     db.comments = db.comments.filter(comment => {
       return comment.author !== args.id;
     });
-    return deleteUser;
+    return deleteUser[0];
   },
   deletePost(parent, args, { db }, info) {
     const findPost = db.posts.findIndex(post => post.id === args.id);
+    if (findPost === -1) {
+      throw new Error("That post was not found");
+    }
     const deletePost = db.posts.splice(findPost, 1);
+
+    db.comments = db.comments.filter(comment => {
+      return comment.post !== args.id;
+    });
+    return deletePost[0];
+  },
+  deleteComment(parent, args, { db }, info) {
+    const findComment = db.comments.findIndex(
+      comment => comment.id === args.id
+    );
+    if (findComment === -1) {
+      throw new Error("This comment does not exist");
+    }
+    const deleteComment = db.comments.splice(findComment, 1);
+
+    return deleteComment[0];
   }
 };
 
