@@ -87,6 +87,29 @@ const Mutation = {
     const deleteComment = db.comments.splice(findComment, 1);
 
     return deleteComment[0];
+  },
+  updateUser(parent, args, { db }, info) {
+    const { id, data } = args;
+    const user = db.users.find(user => {
+      return user.id === id;
+    });
+    if (!user) {
+      throw new Error("There is no user under that name");
+    }
+    if (typeof data.email === "string") {
+      const emailTaken = db.users.some(user => user.email === data.email);
+      if (emailTaken) {
+        throw new Error("This email is taken already");
+      }
+      user.email = data.email;
+    }
+    if (typeof data.name === "string") {
+      user.name = data.name;
+    }
+    if (typeof data.age !== "undefined") {
+      user.age = data.age;
+    }
+    return user;
   }
 };
 
