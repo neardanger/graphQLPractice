@@ -110,6 +110,10 @@ const Mutation = {
       user.age = data.age;
     }
     return user;
+  },
+
+  updatePost(parent, args, { db }, info) {
+    const { id, data } = args;
   }
 };
 
