@@ -102,7 +102,7 @@ const Mutation = {
       throw new Error("That user was not found in the database.");
     }
     if (typeof data.email === "string") {
-      const emailTaken = db.users.some(user => user.id === id);
+      const emailTaken = db.users.some(user => user.email === data.email);
       if (emailTaken) {
         throw new Error("That email is already taken.");
       }
@@ -115,6 +115,41 @@ const Mutation = {
       updatedUser.age = data.age;
     }
     return updatedUser;
+  },
+  updatePost(parent, args, { db }, info) {
+    const { id, data } = args;
+
+    const updatedPost = db.posts.find(post => {
+      return post.id === id;
+    });
+
+    if (!updatedPost) {
+      throw new Error("That post does not exist in the database.");
+    }
+    if (typeof data.title === "string") {
+      updatedPost.title = data.title;
+    }
+    if (typeof data.body === "string") {
+      updatedPost.body = data.body;
+    }
+    if (typeof data.pubished === "boolean") {
+      updatedPost.published = data.published;
+    }
+    return updatedPost;
+  },
+  updateComment(parent, args, { db }, info) {
+    const { id, data } = args;
+    const updatedComment = db.comments.find(comment => comment.id === id);
+    if (!updatedComment) {
+      throw new Error("That comment does not exist in the database.");
+    }
+    if (typeof data.title === "string") {
+      updatedComment.title = data.title;
+    }
+    if (typeof data.body === "string") {
+      updatedComment.body = data.body;
+    }
+    return updatedComment;
   }
 };
 
