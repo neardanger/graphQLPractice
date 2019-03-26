@@ -76,6 +76,45 @@ const Mutation = {
       return comment.post !== args.id;
     });
     return deletePost[0];
+  },
+  deleteComment(parent, args, { db }, info) {
+    const findComment = db.comments.findIndex(
+      comment => comment.id === args.id
+    );
+    if (findComment === -1) {
+      throw new Error("That comment could not be found");
+    }
+    const deleteComment = db.comments.splice(findComment, 1);
+
+    db.posts = db.posts.filter(post => {
+      post.id !== args.id;
+    });
+
+    return deleteComment[0];
+  },
+  updateUser(parent, args, { db }, info) {
+    const { id, data } = args;
+
+    const updatedUser = db.users.find(user => {
+      return user.id === id;
+    });
+    if (!updatedUser) {
+      throw new Error("That user was not found in the database.");
+    }
+    if (typeof data.email === "string") {
+      const emailTaken = db.users.some(user => user.id === id);
+      if (emailTaken) {
+        throw new Error("That email is already taken.");
+      }
+      updatedUser.email = data.email;
+    }
+    if (typeof data.name === "string") {
+      updatedUser.name = data.name;
+    }
+    if (typeof data.age !== "undefined") {
+      updatedUser.age = data.age;
+    }
+    return updatedUser;
   }
 };
 
