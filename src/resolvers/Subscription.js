@@ -26,4 +26,4 @@ const Subscription = {
 
 export { Subscription as default };
 
-//subscription js
+//subscription
